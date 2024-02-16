@@ -2,21 +2,22 @@ import sys
 from PySide6 import QtCore, QtWidgets, QtGui
 
 # Create the search table
-class SearchTable(QtWidgets.QWidget):
+class SearchTable(QtWidgets.QTableWidget):
     def __init__(self):
         super().__init__()
         
         # Initialize the search table
-        self.table = QtWidgets.QTableWidget()
-        self.table.setColumnCount(9)
-        self.table.setRowCount(20)
+        self.setColumnCount(9)
+        self.setRowCount(20)
         
         # Set the columns
         column_names = ["Supertype", "Name", "National No.", "Set", "Set No.", "Pokemon Type", "Pokemon Subtype", "Rarity", "Worth"]
-        self.table.setHorizontalHeaderLabels(column_names)
-        header = self.table.horizontalHeader()
-        header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.setHorizontalHeaderLabels(column_names)
         
+        # Resize the columns and add a scroll bar
+        header = self.horizontalHeader()
+        header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
 
 # Create the search page
 class SearchPage(QtWidgets.QWidget):
@@ -40,17 +41,19 @@ class SearchPage(QtWidgets.QWidget):
         self.layout.addWidget(title)
         
         # Add the table to the layout
-        table = SearchTable()
-        self.layout.addWidget(table)
-        table_height = int(self.height * 0.8)
-        table.setMaximumHeight(table_height)
-        
+        self.table = SearchTable()
+        self.layout.addWidget(self.table)
+    
         
         
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     
-    search = SearchPage(1000, 600)
+    # table = SearchTable()
+    # table.resize(1000, 600)
+    # table.show()
+    
+    search = SearchPage(1150, 700)
     search.resize(search.width, search.height)
     search.show()
     
