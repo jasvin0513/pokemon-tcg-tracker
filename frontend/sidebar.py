@@ -4,7 +4,8 @@ from PySide6 import QtCore, QtWidgets
 # Create the sidebar class
 
 class SideBar(QtWidgets.QFrame):
-    def __init__(self, width, height):
+    # Functional class that will be used with other pages
+    def __init__(self, width, height, stackedWidget = None):
         super().__init__()
         
         # Initialize sidebar size
@@ -22,6 +23,7 @@ class SideBar(QtWidgets.QFrame):
         # Button for the search page
         self.search = QtWidgets.QPushButton("Search")
         self.search.setFixedSize(buttonWidth, buttonHeight)
+        self.search.clicked.connect(lambda: stackedWidget.setCurrentIndex(1))
         
         # Button for the analytics page
         self.analytics = QtWidgets.QPushButton("Analytics")
@@ -39,7 +41,7 @@ class SideBar(QtWidgets.QFrame):
         
         # Add a border when attached to other pages
         self.setStyleSheet("QFrame { border: none; border-right: 2px solid gray; }")
-
+        
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     

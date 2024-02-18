@@ -11,14 +11,44 @@ class SearchTable(QtWidgets.QTableWidget):
         self.setRowCount(20)
         
         # Set the columns
-        column_names = ["Supertype", "Name", "National No.", "Set", "Set No.", "Pokemon Type", "Pokemon Subtype", "Rarity", "Worth"]
-        self.setHorizontalHeaderLabels(column_names)
+        self.column_names = ["Supertype", "Name", "National No.", "Set", "Set No.", "Pokemon Type", "Pokemon Subtype", "Rarity", "Worth"]
+        self.setHorizontalHeaderLabels(self.column_names)
         
         # Resize the columns and add a scroll bar
         header = self.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        
+        # Set a context menu for the header
+        header.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        header.customContextMenuRequested.connect(self.showHeaderContextMenu)
+    
+    # Triggers the filter button when right clicking a column header
+    def showHeaderContextMenu(self, pos):
+        header = self.horizontalHeader()
+        column = header.logicalIndexAt(pos)
 
+        context_menu = QtWidgets.QMenu(self)
+
+        # Create filter action for each column
+        filter_action = context_menu.addAction("Filter")
+        filter_action.triggered.connect(lambda: self.showFilterBox(column))
+
+        context_menu.exec_(header.mapToGlobal(pos))
+    
+    # Displays the filter box
+    def showFilterBox(self, column):
+        filter_text, ok = QtWidgets.QInputDialog.getText(self, "Filter", f"Enter filter text for column {self.column_names[column]}:")
+        if ok:
+            self.applyFilter(column, filter_text)
+    
+    # Applies the filter   
+    def applyFilter(self, column, filter_text):
+        for row in range(self.rowCount()):
+            item = self.item(row, column)
+            if item is not None:
+                item.setHidden(filter_text.lower() not in item.text().lower())
+              
 # Create the search page
 class SearchPage(QtWidgets.QWidget):
     def __init__(self, width, height):
