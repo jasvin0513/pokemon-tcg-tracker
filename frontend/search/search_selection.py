@@ -1,7 +1,7 @@
-import sys
+import sys, warnings, requests
 from PySide6 import QtCore, QtWidgets, QtGui
 import search_api
-
+            
 # Create the selection page
 class SearchSelection(QtWidgets.QTableWidget):
     def __init__(self, width, height):
@@ -26,7 +26,13 @@ class SearchSelection(QtWidgets.QTableWidget):
         filters.append(national_filter)
         
         # Create a filter for sets
-        
+        # Suppress libpng warning
+        warnings.simplefilter("ignore")
+        sets = search_api.get_sets()
+        set_filter = SetFilter(sets)
+        layout.addWidget(set_filter)
+        filters.append(set_filter)
+        warnings.resetwarnings()
         
         # Create a button that searches the API using each filter
         search_button = QtWidgets.QPushButton("Search", self)
@@ -77,30 +83,43 @@ class NationalNoFilter(QtWidgets.QWidget):
         
     def get_content(self):
         return self.filter.text()
-        
+ 
+# Create the Set name filter       
 class SetFilter(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, sets):
         super().__init__()
         
         # Create the filter
         self.type = 'id'
         title = QtWidgets.QLabel("Set:", self)
         
-        # Align elements horizontally
+        # Create the list widget
+        self.list = QtWidgets.QComboBox()
+        
+        # Add each set and their icon
+        for set_name in sets:
+            # Get the icon from the URL
+            response = requests.get(sets[set_name])
+            pixmap = QtGui.QPixmap()
+            pixmap.loadFromData(response.content)
+            icon = QtGui.QIcon(pixmap)
+            
+            # Add the item to the list with its own icon
+            self.list.addItem(icon, set_name)
+        
         layout = QtWidgets.QHBoxLayout(self)
         layout.addWidget(title)
+        layout.addWidget(self.list)
+        
         
     def get_content(self):
-        return self.filter.text()
+        return self.list.currentText()
+        
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     
-    # table = SearchTable()
-    # table.resize(1000, 600)
-    # table.show()
-    
-    selection = SearchSelection(600, 100)
+    selection = SearchSelection(600, 300)
     selection.resize(selection.width, selection.height)
     selection.show()
     

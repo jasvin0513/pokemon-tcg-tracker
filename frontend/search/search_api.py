@@ -56,5 +56,3 @@ def get_sets():
         set_data[set.get("name")] = set.get("images").get("symbol")
         
     return set_data
-
-search_cards('id:xy1')
