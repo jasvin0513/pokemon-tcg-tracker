@@ -16,7 +16,6 @@ if not api_key:
 
 class Card():
     def __init__(self, data):
-        print(data)
         self.supertype = data.get("supertype")
         self.name = data.get("name")
         self.nationalPokedexNumbers = data.get("nationalPokedexNumbers")
@@ -29,11 +28,18 @@ class Card():
         else:
             self.subtype = data.get("subtypes")
         
-        self.price = data.get("cardmarket", {}).get("prices", {}).get("averageSellPrice")
+        self.price = self.set_price(data)
         
     def __str__(self):
         return f"Card: {self.name}\nSupertype: {self.supertype}\nSet: {self.set}\nSet Number: {self.setNo}\nTypes: {self.types}\nSubtypes: {self.subtype}\nPrice: {self.price}"
         
+    # Price function to avoid having missing prices
+    def set_price(self, data):
+        if data.get("cardmarket", {}).get("prices", {}).get("averageSellPrice") != None:
+            return float(data.get("cardmarket", {}).get("prices", {}).get("averageSellPrice")) * 1.45
+        else:
+            return float(data.get("tcgplayer", {}).get("prices", {}).get("holofoil", {}).get("market")) * 1.35
+    
 # Search cards
 def search_cards(user_params = None):
     # Load API
@@ -42,7 +48,7 @@ def search_cards(user_params = None):
     params = {'q' : user_params}
 
     # Set parameters and send a request
-    response = requests.get(url, headers = headers, params=params)
+    response = requests.get(url, headers = headers, params = params)
 
     if response.status_code == 200:
         data = response.json()
@@ -55,10 +61,7 @@ def search_cards(user_params = None):
 
     for card in card_data:
         parsed_card = Card(card)
-        
-        if parsed_card.price == None:
-            print(parsed_card)
-            
+        print(parsed_card)      
         parsed_cards.append(parsed_card)
     
     return parsed_cards
@@ -87,5 +90,3 @@ def get_sets():
         set_data.append((set.get("name"), set.get("id"), set.get("images").get("symbol")))
         
     return set_data
-
-search_cards('name:charizard set.name:celebrations')
