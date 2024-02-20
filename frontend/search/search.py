@@ -1,3 +1,6 @@
+"""
+This is the main search file that displays all cards captured by a search
+"""
 import sys
 from PySide6 import QtCore, QtWidgets, QtGui
 

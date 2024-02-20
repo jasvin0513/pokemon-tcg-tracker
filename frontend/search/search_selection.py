@@ -1,6 +1,11 @@
-import sys, warnings, requests
+"""
+This script provides users with a popup that lets them filter their search for cards
+"""
+
+import sys, warnings
 from PySide6 import QtCore, QtWidgets, QtGui
 import search_api
+import search_filters
             
 # Create the selection page
 class SearchSelection(QtWidgets.QTableWidget):
@@ -16,20 +21,19 @@ class SearchSelection(QtWidgets.QTableWidget):
         layout = QtWidgets.QVBoxLayout(self)
         
         # Create a filter for Pokemon names
-        name_filter = NameFilter()
+        name_filter = search_filters.NameFilter()
         layout.addWidget(name_filter)
         filters.append(name_filter)
         
         #Create a filter for the national Pokedex numbers
-        national_filter = NationalNoFilter()
+        national_filter = search_filters.NationalNoFilter()
         layout.addWidget(national_filter)
         filters.append(national_filter)
         
         # Create a filter for sets
-        # Suppress libpng warning
-        warnings.simplefilter("ignore")
+        warnings.filterwarnings("ignore", category=UserWarning, module="qt.gui.imageio")
         sets = search_api.get_sets()
-        set_filter = SetFilter(sets)
+        set_filter = search_filters.SetFilter(sets)
         layout.addWidget(set_filter)
         filters.append(set_filter)
         warnings.resetwarnings()
@@ -47,73 +51,6 @@ class SearchSelection(QtWidgets.QTableWidget):
                 parameters += (f" {filter.type}:{filter.get_content()} ")
         
         search_api.search_cards(parameters)
-
-# Create the Pokemon name filter
-class NameFilter(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
-        
-        # Create the filter
-        self.type = 'name'
-        title = QtWidgets.QLabel("Name:", self)
-        self.filter = QtWidgets.QLineEdit(self)
-        
-        # Align elements horizontally
-        layout = QtWidgets.QHBoxLayout(self)
-        layout.addWidget(title)
-        layout.addWidget(self.filter)
-        
-    def get_content(self):
-        return self.filter.text()
-
-# Create the Pokemon name filter
-class NationalNoFilter(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
-        
-        # Create the filter
-        self.type = 'nationalPokedexNumbers'
-        title = QtWidgets.QLabel("National No.:", self)
-        self.filter = QtWidgets.QLineEdit(self)
-        
-        # Align elements horizontally
-        layout = QtWidgets.QHBoxLayout(self)
-        layout.addWidget(title)
-        layout.addWidget(self.filter)
-        
-    def get_content(self):
-        return self.filter.text()
- 
-# Create the Set name filter       
-class SetFilter(QtWidgets.QWidget):
-    def __init__(self, sets):
-        super().__init__()
-        
-        # Create the filter
-        self.type = 'id'
-        title = QtWidgets.QLabel("Set:", self)
-        
-        # Create the list widget
-        self.list = QtWidgets.QComboBox()
-        
-        # Add each set and their icon
-        for set_name in sets:
-            # Get the icon from the URL
-            response = requests.get(sets[set_name])
-            pixmap = QtGui.QPixmap()
-            pixmap.loadFromData(response.content)
-            icon = QtGui.QIcon(pixmap)
-            
-            # Add the item to the list with its own icon
-            self.list.addItem(icon, set_name)
-        
-        layout = QtWidgets.QHBoxLayout(self)
-        layout.addWidget(title)
-        layout.addWidget(self.list)
-        
-        
-    def get_content(self):
-        return self.list.currentText()
         
 
 if __name__ == "__main__":
