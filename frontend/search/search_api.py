@@ -22,8 +22,9 @@ class Card():
         self.set = data.get("set", {}).get("name")
         self.setNo = data.get("number")
         self.types = data.get("types", [])
+        self.image = data.get("images",{}).get("small")
         
-        if len(data.get("subtypes")) > 1:
+        if data.get("subtypes") and len(data.get("subtypes")) > 1:
             self.subtype = data.get("subtypes", [])[-1]
         else:
             self.subtype = data.get("subtypes")
@@ -61,7 +62,6 @@ def search_cards(user_params = None):
 
     for card in card_data:
         parsed_card = Card(card)
-        print(parsed_card)      
         parsed_cards.append(parsed_card)
     
     return parsed_cards
