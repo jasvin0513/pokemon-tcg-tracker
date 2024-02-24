@@ -16,15 +16,15 @@ class LoadingScreen(QtWidgets.QDialog):
         self.setWindowTitle("Loading filters...")
         self.setFixedSize(300, 1)
         self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
-    
+
 # Create the selection page
 class SearchSelection(QtWidgets.QTableWidget):
-    def __init__(self, width, height):
+    def __init__(self, app):
         super().__init__()
         
         # Initialize home page size
-        self.width = width
-        self.height = height
+        self.width = 600
+        self.height = 300
         
         # Create a loading screen
         self.loading_screen = LoadingScreen()
@@ -61,7 +61,7 @@ class SearchSelection(QtWidgets.QTableWidget):
         search_button.clicked.connect(self.close)
         layout.addWidget(search_button)
         
-        # Connect the aboutToQuit signal to a function that returns the cards before the application closes
+        # Connect the aboutToQuit signal to a function that prints the cards before the application closes
         app.aboutToQuit.connect(lambda: print(self.cards))
     
     def set_cards(self, result):
@@ -77,10 +77,10 @@ class SearchSelection(QtWidgets.QTableWidget):
         
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
-    
-    selection = SearchSelection(600, 300)
+    filter_app = QtWidgets.QApplication([])
+
+    selection = SearchSelection(filter_app)
     selection.resize(selection.width, selection.height)
     selection.show()
-    
-    sys.exit(app.exec())
+
+    sys.exit(filter_app.exec())

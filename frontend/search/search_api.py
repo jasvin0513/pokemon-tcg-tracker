@@ -46,7 +46,8 @@ def search_cards(user_params = None):
     # Load API
     url = "https://api.pokemontcg.io/v2/cards"
     headers = {"X-Api-Key": api_key}
-    params = {'q' : user_params}
+    params = {'q' : user_params,
+              'orderBy': 'set.releaseDate, number'}
 
     # Set parameters and send a request
     response = requests.get(url, headers = headers, params = params)
