@@ -36,18 +36,29 @@ class Card():
         
     # Price function to avoid having missing prices
     def set_price(self, data):
-        if data.get("cardmarket", {}).get("prices", {}).get("averageSellPrice") != None:
-            return float(data.get("cardmarket", {}).get("prices", {}).get("averageSellPrice")) * 1.45
-        else:
+        # Try tcgplayer for normal cards first
+        if data.get("tcgplayer", {}).get("prices", {}).get("normal", {}).get("market"):
+            return float(data.get("tcgplayer", {}).get("prices", {}).get("normal", {}).get("market")) * 1.35
+        # Try holofoil prices next
+        elif data.get("tcgplayer", {}).get("prices", {}).get("holofoil", {}).get("market"):
             return float(data.get("tcgplayer", {}).get("prices", {}).get("holofoil", {}).get("market")) * 1.35
+        # Try cardmarket next
+        elif data.get("cardmarket", {}).get("prices", {}).get("averageSellPrice"):
+            return float(data.get("cardmarket", {}).get("prices", {}).get("averageSellPrice")) * 1.45
+        # If a normal card price doesn't exist, get the 7 day average
+        else:
+            try:
+                return float(data.get("cardmarket", {}).get("prices", {}).get("avg7")) * 1.45
+            except:
+                return None
     
 # Search cards
 def search_cards(user_params = None):
     # Load API
     url = "https://api.pokemontcg.io/v2/cards"
     headers = {"X-Api-Key": api_key}
-    params = {'q' : user_params,
-              'orderBy': 'set.releaseDate, number'}
+    params = {'q' : user_params}#,
+              #'orderBy': 'set.releaseDate, number'}
 
     # Set parameters and send a request
     response = requests.get(url, headers = headers, params = params)
@@ -91,3 +102,6 @@ def get_sets():
         set_data.append((set.get("name"), set.get("id"), set.get("images").get("symbol")))
         
     return set_data
+
+if __name__ == "__main__":
+    print(search_cards('set.id:ex8'))

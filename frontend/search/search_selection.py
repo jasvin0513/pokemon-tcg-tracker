@@ -18,7 +18,11 @@ class LoadingScreen(QtWidgets.QDialog):
         self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
 
 # Create the selection page
-class SearchSelection(QtWidgets.QTableWidget):
+class SearchSelection(QtWidgets.QWidget):
+    # Create a custom signal
+    cards_emitted = QtCore.Signal(list)
+    hideRequested = QtCore.Signal()
+    
     def __init__(self, app):
         super().__init__()
         
@@ -58,23 +62,36 @@ class SearchSelection(QtWidgets.QTableWidget):
         # Create a button that searches the API using each filter
         search_button = QtWidgets.QPushButton("Search", self)
         search_button.clicked.connect(lambda: self.set_cards(self.search_cards(filters)))
-        search_button.clicked.connect(self.close)
+        self.cards_emitted.connect(self.handle_cards_received)
         layout.addWidget(search_button)
         
         # Connect the aboutToQuit signal to a function that prints the cards before the application closes
-        app.aboutToQuit.connect(lambda: print(self.cards))
+        # app.aboutToQuit.connect(lambda: print(self.cards))
     
+    # Sets the list of cards for the widget
     def set_cards(self, result):
         self.cards = result
+        self.emit_cards_signal()
     
+    # Sends a list of cards to other widgets as a signal
+    def emit_cards_signal(self):
+        print(f"Signal emitted with {len(self.cards)} cards")
+        self.cards_emitted.emit(self.cards)
+        self.hideRequested.emit()
+        self.cards = None
+        
+    def handle_cards_received(self, cards):
+        print(f"Received cards signal with {len(cards)} cards in SearchSelection")
+    
+    # Searches the card API and returns a list of cards
     def search_cards(self, filters):
         parameters = ''
         for filter in filters:
             if filter.get_content().strip():
                 parameters += (f" {filter.type}:{filter.get_content()} ")
         
+        print(f"Search parameters: {parameters}")
         return search_api.search_cards(parameters)
-        
 
 if __name__ == "__main__":
     filter_app = QtWidgets.QApplication([])

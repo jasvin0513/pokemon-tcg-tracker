@@ -72,7 +72,7 @@ class SearchPage(QtWidgets.QWidget):
         
         # Create the filter button
         search_selection_button = QtWidgets.QPushButton('Filter')
-        search_selection_button.clicked.connect(self.show_search_selection())
+        search_selection_button.clicked.connect(self.toggle_search_selection)
         
         # Create a vertical layout
         self.layout = QtWidgets.QVBoxLayout(self)
@@ -84,11 +84,28 @@ class SearchPage(QtWidgets.QWidget):
         self.table = CardGrid(list(range(1,10)))
         self.layout.addWidget(self.table)
     
-    def show_search_selection(self):
-        # Create and show the SearchSelection widget
-        selection_widget = search_selection.SearchSelection()
-        selection_widget.show()
-        
+    # Control the SearchSelection widget
+    def toggle_search_selection(self):
+        # Check if the SearchSelection widget is already visible
+        if hasattr(self, 'selection_widget') and self.selection_widget.isVisible():
+            self.selection_widget.hide()
+        else:
+            # Create and show the SearchSelection widget
+            self.selection_widget = search_selection.SearchSelection(self)
+            self.selection_widget.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
+            self.selection_widget.show()
+            
+            # Connect the hideRequested signal to hide_search_selection method
+            self.selection_widget.hideRequested.connect(self.hide_search_selection)
+            # Connect the cardsReceived signal to handle_cards_received method
+            self.selection_widget.cards_emitted.connect(self.handle_cards_received)
+
+    def hide_search_selection(self):
+        if hasattr(self, 'selection_widget'):
+            self.selection_widget.hide()
+            
+    def handle_cards_received(self, cards):
+        print(f"Received cards signal with {len(cards)} cards in SearchPage")
         
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
