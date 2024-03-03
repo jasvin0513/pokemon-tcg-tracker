@@ -6,6 +6,21 @@ import sys, warnings, requests
 from PySide6 import QtCore, QtWidgets, QtGui
 import search_api
 
+# Create a loading screen while the filters load
+class LoadingScreen(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Loading filters...")
+        self.setFixedSize(300, 1)
+        self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
+
+# Caches the filters to reduce API calls
+class FilterCache():
+    def __init__(self):
+        self.NameFilter = NameFilter()
+        self.NationalNoFilter = NationalNoFilter()
+        self.SetFilter = SetFilter()
+
 # Create the Pokemon name filter
 class NameFilter(QtWidgets.QWidget):
     def __init__(self):
@@ -44,8 +59,11 @@ class NationalNoFilter(QtWidgets.QWidget):
 
 # Create the Set name filter       
 class SetFilter(QtWidgets.QWidget):
-    def __init__(self, sets):
+    def __init__(self):
         super().__init__()
+        
+        # Get all sets from the API
+        sets = search_api.get_sets()
         
         # Create the filter
         self.type = 'set.id'

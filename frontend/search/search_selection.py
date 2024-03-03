@@ -9,21 +9,13 @@ import search_filters
 
 os.environ["QT_LOGGING_RULES"] = "qt.gui.imageio=false"
 
-# Create a loading screen while the filters load
-class LoadingScreen(QtWidgets.QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Loading filters...")
-        self.setFixedSize(300, 1)
-        self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
-
 # Create the selection page
 class SearchSelection(QtWidgets.QWidget):
     # Create a custom signal
     cards_emitted = QtCore.Signal(list)
     hideRequested = QtCore.Signal()
     
-    def __init__(self, app):
+    def __init__(self, app, filter_cache = None):
         super().__init__()
         
         # Initialize home page size
@@ -31,26 +23,34 @@ class SearchSelection(QtWidgets.QWidget):
         self.height = 300
         
         # Create a loading screen
-        self.loading_screen = LoadingScreen()
+        self.loading_screen = search_filters.LoadingScreen()
         self.loading_screen.show()
         
         # Align each search criteria vertically and add them to the list of filters
         filters = []
         layout = QtWidgets.QVBoxLayout(self)
         
-        # Create a filter for Pokemon names
-        name_filter = search_filters.NameFilter()
+        # If the cache is empty, create each filter. Otherwise use the cache
+        if filter_cache == None:
+            # Name filter
+            name_filter = search_filters.NameFilter()
+            # National number filter
+            national_filter = search_filters.NationalNoFilter()
+            # Set filter
+            set_filter = search_filters.SetFilter()
+        else:
+            # Name filter
+            name_filter = filter_cache.NameFilter
+            # National number filter
+            national_filter = filter_cache.NationalNoFilter
+            # Set filter
+            set_filter = filter_cache.SetFilter
+            
+        # Add filters to the layout and list of filters
         layout.addWidget(name_filter)
         filters.append(name_filter)
-        
-        #Create a filter for the national Pokedex numbers
-        national_filter = search_filters.NationalNoFilter()
         layout.addWidget(national_filter)
         filters.append(national_filter)
-
-        # Create a filter for sets
-        sets = search_api.get_sets()
-        set_filter = search_filters.SetFilter(sets)
         layout.addWidget(set_filter)
         filters.append(set_filter)
         

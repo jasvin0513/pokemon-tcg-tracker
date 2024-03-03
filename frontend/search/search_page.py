@@ -3,7 +3,7 @@ This is the main search file that displays all cards captured by a search
 """
 import sys
 from PySide6 import QtCore, QtWidgets, QtGui
-import search_selection
+import search_selection, search_filters
 
 # Create the search table
 class CardGrid(QtWidgets.QWidget):
@@ -20,28 +20,30 @@ class CardGrid(QtWidgets.QWidget):
         col = 0
         
         # Iterate through each card object and display them as a widget
-        for card in cards:
-            # Create the card widget
-            card_widget = QtWidgets.QPushButton()
-            card_widget.setStyleSheet("background-color: white; border: 1px solid black;")
-            card_widget.setFixedSize(245, 342)
-            name = QtWidgets.QLabel(str(card))
-            name.setFont(QtGui.QFont('Arial Font', 12))
-            name.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
-            
-            # Make card clickable
-            card_widget.clicked.connect(lambda: print("Card clicked"))
-            
-            # Add the card to the next available position
-            card_layout.addWidget(card_widget, row, col)
-            row += 1
-            card_layout.addWidget(name, row, col)
-            col += 1
-            row -= 1
-            
-            if col == 3:
-                row += 2
-                col = 0
+        if cards:
+            for card in cards:
+                # Create the card widget
+                card_widget = QtWidgets.QPushButton()
+                card_widget.setStyleSheet("background-color: white; border: 1px solid black;")
+                card_widget.setFixedSize(245, 342)
+                name = QtWidgets.QLabel(str(card))
+                name.setFont(QtGui.QFont('Arial Font', 12))
+                name.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+                
+                # Make card clickable
+                card_widget.clicked.connect(lambda: print("Card clicked"))
+                
+                # Add the card to the next available position
+                card_layout.addWidget(card_widget, row, col)
+                row += 1
+                card_layout.addWidget(name, row, col)
+                col += 1
+                row -= 1
+                
+                # Start a new row after every 3 cards
+                if col == 3:
+                    row += 2
+                    col = 0
 
             
         # Create a scrollable grid
@@ -70,7 +72,9 @@ class SearchPage(QtWidgets.QWidget):
         font.setPointSize(18)
         title.setFont(font)
         
-        # Create the filter button
+        # Create the filter button and a cache for the filters
+        self.filter_cache = None
+        self.cards = None
         search_selection_button = QtWidgets.QPushButton('Filter')
         search_selection_button.clicked.connect(self.toggle_search_selection)
         
@@ -81,7 +85,7 @@ class SearchPage(QtWidgets.QWidget):
         
         # Add the table and filter to the layout
         self.layout.addWidget(search_selection_button)
-        self.table = CardGrid(list(range(1,10)))
+        self.table = CardGrid(self.cards)
         self.layout.addWidget(self.table)
     
     # Control the SearchSelection widget
@@ -90,8 +94,18 @@ class SearchPage(QtWidgets.QWidget):
         if hasattr(self, 'selection_widget') and self.selection_widget.isVisible():
             self.selection_widget.hide()
         else:
+            # Initialize the filter cache if needed
+            if self.filter_cache == None:
+                self.loading_screen = search_filters.LoadingScreen()
+                self.loading_screen.show()
+                self.filter_cache = search_filters.FilterCache()
+                
+                # Once all filters are populated, hide the loading screen
+                if self.loading_screen.isVisible():
+                    self.loading_screen.hide()
+                
             # Create and show the SearchSelection widget
-            self.selection_widget = search_selection.SearchSelection(self)
+            self.selection_widget = search_selection.SearchSelection(self, self.filter_cache)
             self.selection_widget.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
             self.selection_widget.show()
             
@@ -99,13 +113,20 @@ class SearchPage(QtWidgets.QWidget):
             self.selection_widget.hideRequested.connect(self.hide_search_selection)
             # Connect the cardsReceived signal to handle_cards_received method
             self.selection_widget.cards_emitted.connect(self.handle_cards_received)
-
+    
+    # Hide the SearchSelection widget if it is visible
     def hide_search_selection(self):
         if hasattr(self, 'selection_widget'):
             self.selection_widget.hide()
-            
+    
+    # Check to see if the cards were selected by the filter
     def handle_cards_received(self, cards):
         print(f"Received cards signal with {len(cards)} cards in SearchPage")
+        self.cards = cards
+        self.layout.removeWidget(self.table)
+        self.table = CardGrid(self.cards)
+        self.layout.addWidget(self.table)
+        
         
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
