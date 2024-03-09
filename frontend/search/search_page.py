@@ -3,7 +3,7 @@ This is the main search file that displays all cards captured by a search
 """
 import sys
 from PySide6 import QtCore, QtWidgets, QtGui
-import search_selection, search_filters
+import search_selection, search_filters, requests
 
 # Create the search table
 class CardGrid(QtWidgets.QWidget):
@@ -22,16 +22,22 @@ class CardGrid(QtWidgets.QWidget):
         # Iterate through each card object and display them as a widget
         if cards:
             for card in cards:
+                # Get the card's image
+                response = requests.get(card.image_url)
+                pixmap_icon = QtGui.QPixmap()
+                pixmap_icon.loadFromData(response.content)
+                
                 # Create the card widget
                 card_widget = QtWidgets.QPushButton()
-                card_widget.setStyleSheet("background-color: white; border: 1px solid black;")
-                card_widget.setFixedSize(245, 342)
+                card_widget.setIcon(pixmap_icon)
+                card_widget.setIconSize(QtCore.QSize(245, 342)) 
+                
                 name = QtWidgets.QLabel(str(card))
                 name.setFont(QtGui.QFont('Arial Font', 12))
                 name.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
                 
                 # Make card clickable
-                card_widget.clicked.connect(lambda: print("Card clicked"))
+                card_widget.clicked.connect(lambda: self.show_card_details(card, pixmap_icon))
                 
                 # Add the card to the next available position
                 card_layout.addWidget(card_widget, row, col)
@@ -45,7 +51,6 @@ class CardGrid(QtWidgets.QWidget):
                     row += 2
                     col = 0
 
-            
         # Create a scrollable grid
         scroll_area = QtWidgets.QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -54,8 +59,47 @@ class CardGrid(QtWidgets.QWidget):
         scroll_area.setWidget(card_grid)
         scroll_area.setMaximumHeight(500)
         main_layout.addWidget(scroll_area)
+        
+    def show_card_details(self, card, icon):
+        card_details_popup = CardDetails(card, icon)
+        card_details_popup.exec()
             
-              
+# Create the card details page when a card button is clicked
+class CardDetails(QtWidgets.QWidget):
+    def __init__(self, card, icon):
+        super().__init__()
+        
+        # Displays the card's icon
+        card_image = QtWidgets.QLabel(self)
+        card_image.setPixmap(icon)
+        
+        # Displays the card's information
+        card_information = QtWidgets.QLabel(str(card))
+        
+        # Input widget for the number of copies to be added to the collection
+        quantity_input = QtWidgets.QLineEdit(self)
+        
+        # Button to add cards to the collection
+        confirm_button = QtWidgets.QPushButton("Add to Collection")
+        confirm_button.clicked.connect(lambda: self.add_cards(quantity_input.text()))
+        
+        # Display all components vertically
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(card_image)
+        layout.addWidget(card_information)
+        layout.addWidget(quantity_input)
+        layout.addWidget(confirm_button)
+    
+    def add_cards(self, quantity):
+        try:
+            if int(quantity) > 0:
+                print(f"{quantity} added to collection")
+                self.close()
+            else:
+                print("Invalid quantity")
+        except:
+            print("Invalid quantity")
+
 # Create the search page
 class SearchPage(QtWidgets.QWidget):
     def __init__(self, width, height):

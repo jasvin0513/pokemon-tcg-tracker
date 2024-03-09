@@ -22,14 +22,17 @@ class Card():
         self.set = data.get("set", {}).get("name")
         self.setNo = data.get("number")
         self.types = data.get("types", [])
-        self.image = data.get("images",{}).get("small")
+        self.image_url = data.get("images",{}).get("small")
         
         if data.get("subtypes") and len(data.get("subtypes")) > 1:
             self.subtype = data.get("subtypes", [])[-1]
         else:
             self.subtype = data.get("subtypes")
         
-        self.price = self.set_price(data)
+        if self.set_price(data):
+            self.price = round(self.set_price(data), 2)
+        else:
+            self.price = self.set_price(data)
         
     def __str__(self):
         return f"Card: {self.name}\nSupertype: {self.supertype}\nSet: {self.set}\nSet Number: {self.setNo}\nTypes: {self.types}\nSubtypes: {self.subtype}\nPrice: {self.price}"
@@ -102,6 +105,3 @@ def get_sets():
         set_data.append((set.get("name"), set.get("id"), set.get("images").get("symbol")))
         
     return set_data
-
-if __name__ == "__main__":
-    print(search_cards('set.id:ex8'))
