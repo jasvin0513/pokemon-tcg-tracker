@@ -2,6 +2,7 @@
 This is the main search file that displays all cards captured by a search
 """
 import sys
+from functools import partial
 from PySide6 import QtCore, QtWidgets, QtGui
 import search_selection, search_filters, requests
 
@@ -37,7 +38,7 @@ class CardGrid(QtWidgets.QWidget):
                 name.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
                 
                 # Make card clickable
-                card_widget.clicked.connect(lambda: self.show_card_details(card, pixmap_icon))
+                card_widget.clicked.connect(partial(self.show_card_details, card, pixmap_icon))
                 
                 # Add the card to the next available position
                 card_layout.addWidget(card_widget, row, col)
@@ -65,7 +66,7 @@ class CardGrid(QtWidgets.QWidget):
         card_details_popup.exec()
             
 # Create the card details page when a card button is clicked
-class CardDetails(QtWidgets.QWidget):
+class CardDetails(QtWidgets.QDialog):
     def __init__(self, card, icon):
         super().__init__()
         
@@ -94,7 +95,7 @@ class CardDetails(QtWidgets.QWidget):
         try:
             if int(quantity) > 0:
                 print(f"{quantity} added to collection")
-                self.close()
+                self.accept()
             else:
                 print("Invalid quantity")
         except:
