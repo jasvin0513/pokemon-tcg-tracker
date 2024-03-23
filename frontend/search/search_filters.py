@@ -21,6 +21,7 @@ class FilterCache():
         self.NameFilter = NameFilter()
         self.NationalNoFilter = NationalNoFilter()
         self.SetFilter = SetFilter()
+        self.TypeFilter = TypeFilter()
 
 # Create the Supertype filter
 class SupertypeFilter(QtWidgets.QWidget):
@@ -131,7 +132,46 @@ class SetFilter(QtWidgets.QWidget):
             return self.set_data[selected_index]['id']
         else:
             return ''
-    
+
+# Create the Type filter       
+class TypeFilter(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        
+        # Get all sets from the API
+        types = search_api.get_types()
+        
+        # Create the filter
+        self.type = 'types'
+        title = QtWidgets.QLabel("Type:", self)
+        
+        # Create the list widget
+        self.list = QtWidgets.QComboBox()
+        self.list.addItem('All')
+        
+        # Add each set and their icon
+        self.type_data = []  # Create a list to store set data
+        self.type_data.append({'type_name': 'All'})
+        for type in types:  
+            # Add the type to the list
+            self.list.addItem(type)
+            
+            # Store set data in the list
+            self.type_data.append({'type_name': type})
+        
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.addWidget(title)
+        layout.addWidget(self.list)
+        
+        
+    def get_content(self):
+        selected_index = self.list.currentIndex()
+        if selected_index > 0:
+            print(f"Searching {self.type_data[selected_index]['type_name']}")
+            return self.type_data[selected_index]['type_name']
+        else:
+            return ''
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     

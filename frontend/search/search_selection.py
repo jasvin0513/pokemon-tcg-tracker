@@ -39,6 +39,8 @@ class SearchSelection(QtWidgets.QWidget):
             national_filter = search_filters.NationalNoFilter()
             # Set filter
             set_filter = search_filters.SetFilter()
+            # Type filter
+            type_filter = search_filters.TypeFilter()
         else:
             # Supertype filter
             supertype_filter = filter_cache.SupertypeFilter
@@ -48,6 +50,8 @@ class SearchSelection(QtWidgets.QWidget):
             national_filter = filter_cache.NationalNoFilter
             # Set filter
             set_filter = filter_cache.SetFilter
+            # Type filter
+            type_filter = filter_cache.TypeFilter
             
         # Add filters to the layout and list of filters
         # Supertype filter
@@ -62,6 +66,9 @@ class SearchSelection(QtWidgets.QWidget):
         # Set filter
         layout.addWidget(set_filter)
         filters.append(set_filter)
+        # Type filter
+        layout.addWidget(type_filter)
+        filters.append(type_filter)
         
         # Once all filters are populated, hide the loading screen
         if self.loading_screen.isVisible():

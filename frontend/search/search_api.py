@@ -105,3 +105,22 @@ def get_sets():
         set_data.append((set.get("name"), set.get("id"), set.get("images").get("symbol")))
         
     return set_data
+
+# Get sets
+def get_types():
+    # Load API
+    url = "https://api.pokemontcg.io/v2/types"
+    headers = {"X-Api-Key": api_key}
+
+    # Set parameters and send a request
+    response = requests.get(url, headers = headers)
+    
+    if response.status_code == 200:
+        data = response.json()
+    else:
+        print("Failed to retrieve data. Status code:", response.status_code)
+    
+    # Parse the JSON data and store the set data
+    types = data.get("data", [])
+        
+    return types
