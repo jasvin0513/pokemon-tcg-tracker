@@ -2,9 +2,9 @@
 This script creates all the filter classes for the search module
 """
 
-import sys, warnings, requests
+import sys, requests
 from PySide6 import QtCore, QtWidgets, QtGui
-import search_api
+from . import search_api
 
 # Create a loading screen while the filters load
 class LoadingScreen(QtWidgets.QDialog):
@@ -17,9 +17,39 @@ class LoadingScreen(QtWidgets.QDialog):
 # Caches the filters to reduce API calls
 class FilterCache():
     def __init__(self):
+        self.SupertypeFilter = SupertypeFilter()
         self.NameFilter = NameFilter()
         self.NationalNoFilter = NationalNoFilter()
         self.SetFilter = SetFilter()
+
+# Create the Supertype filter
+class SupertypeFilter(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        
+        # Create the filter
+        self.type = 'supertype'
+        title = QtWidgets.QLabel("Supertype:", self)
+        
+        # Create the dropdown menu
+        self.filter = QtWidgets.QComboBox()
+        self.filter.addItem("All")
+        self.filter.addItem("Energy")
+        self.filter.addItem("Pokémon")
+        self.filter.addItem("Trainer")
+        
+        # Align elements horizontally
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.addWidget(title)
+        layout.addWidget(self.filter)
+        
+    
+    def get_content(self):
+        selected_index = self.filter.currentIndex()
+        if selected_index > 0:
+            return self.filter.currentText()
+        else:
+            return ''
 
 # Create the Pokemon name filter
 class NameFilter(QtWidgets.QWidget):
@@ -75,6 +105,7 @@ class SetFilter(QtWidgets.QWidget):
         
         # Add each set and their icon
         self.set_data = []  # Create a list to store set data
+        self.set_data.append({'set_name': 'All', 'id': ''})
         for set_name, id, icon_url in sets:
             # Get the icon from the URL
             response = requests.get(icon_url)
@@ -96,6 +127,7 @@ class SetFilter(QtWidgets.QWidget):
     def get_content(self):
         selected_index = self.list.currentIndex()
         if selected_index > 0:
+            print(f"Searching {self.set_data[selected_index]['id']}")
             return self.set_data[selected_index]['id']
         else:
             return ''

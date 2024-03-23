@@ -1,10 +1,10 @@
 """
 This is the main search file that displays all cards captured by a search
 """
-import sys
+import sys, requests
 from functools import partial
 from PySide6 import QtCore, QtWidgets, QtGui
-import search_selection, search_filters, requests
+from . import search_selection, search_filters
 
 # Create the search table
 class CardGrid(QtWidgets.QWidget):

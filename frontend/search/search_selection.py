@@ -4,8 +4,7 @@ This script provides users with a popup that lets them filter their search for c
 
 import sys, os
 from PySide6 import QtCore, QtWidgets, QtGui
-import search_api
-import search_filters
+from . import search_api, search_filters
 
 os.environ["QT_LOGGING_RULES"] = "qt.gui.imageio=false"
 
@@ -32,6 +31,8 @@ class SearchSelection(QtWidgets.QWidget):
         
         # If the cache is empty, create each filter. Otherwise use the cache
         if filter_cache == None:
+            # Supertype filter
+            supertype_filter = search_filters.SupertypeFilter()
             # Name filter
             name_filter = search_filters.NameFilter()
             # National number filter
@@ -39,6 +40,8 @@ class SearchSelection(QtWidgets.QWidget):
             # Set filter
             set_filter = search_filters.SetFilter()
         else:
+            # Supertype filter
+            supertype_filter = filter_cache.SupertypeFilter
             # Name filter
             name_filter = filter_cache.NameFilter
             # National number filter
@@ -47,10 +50,16 @@ class SearchSelection(QtWidgets.QWidget):
             set_filter = filter_cache.SetFilter
             
         # Add filters to the layout and list of filters
+        # Supertype filter
+        layout.addWidget(supertype_filter)
+        filters.append(supertype_filter)
+        # Name filter
         layout.addWidget(name_filter)
         filters.append(name_filter)
+        # National number filter
         layout.addWidget(national_filter)
         filters.append(national_filter)
+        # Set filter
         layout.addWidget(set_filter)
         filters.append(set_filter)
         
