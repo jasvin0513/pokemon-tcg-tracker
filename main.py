@@ -1,8 +1,8 @@
 import sys
 from PySide6 import QtWidgets
-from home import HomePage
-from sidebar import SideBar
-from search.search_page import SearchPage
+from Home.home import HomePage
+from Sidebar.sidebar import SideBar
+from Search.search_page import SearchPage
 
 class MainWindow(QtWidgets.QWidget):
     def __init__(self):
