@@ -106,7 +106,7 @@ def get_sets():
         
     return set_data
 
-# Get sets
+# Get types
 def get_types():
     # Load API
     url = "https://api.pokemontcg.io/v2/types"
@@ -124,3 +124,22 @@ def get_types():
     types = data.get("data", [])
         
     return types
+
+# Get subtypes
+def get_subtypes():
+    # Load API
+    url = "https://api.pokemontcg.io/v2/subtypes"
+    headers = {"X-Api-Key": api_key}
+
+    # Set parameters and send a request
+    response = requests.get(url, headers = headers)
+    
+    if response.status_code == 200:
+        data = response.json()
+    else:
+        print("Failed to retrieve data. Status code:", response.status_code)
+    
+    # Parse the JSON data and store the set data
+    subtypes = data.get("data", [])
+        
+    return subtypes

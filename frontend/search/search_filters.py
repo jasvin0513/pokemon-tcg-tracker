@@ -22,6 +22,7 @@ class FilterCache():
         self.NationalNoFilter = NationalNoFilter()
         self.SetFilter = SetFilter()
         self.TypeFilter = TypeFilter()
+        self.SubtypeFilter = SubtypeFilter()
 
 # Create the Supertype filter
 class SupertypeFilter(QtWidgets.QWidget):
@@ -169,6 +170,45 @@ class TypeFilter(QtWidgets.QWidget):
         if selected_index > 0:
             print(f"Searching {self.type_data[selected_index]['type_name']}")
             return self.type_data[selected_index]['type_name']
+        else:
+            return ''
+        
+# Create the Subtype filter       
+class SubtypeFilter(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        
+        # Get all sets from the API
+        subtypes = search_api.get_subtypes()
+        
+        # Create the filter
+        self.type = 'subtypes'
+        title = QtWidgets.QLabel("Subtype:", self)
+        
+        # Create the list widget
+        self.list = QtWidgets.QComboBox()
+        self.list.addItem('All')
+        
+        # Add each set and their icon
+        self.subtype_data = []  # Create a list to store set data
+        self.subtype_data.append({'subtype_name': 'All'})
+        for subtype in subtypes:  
+            # Add the subtype to the list
+            self.list.addItem(subtype)
+            
+            # Store set data in the list
+            self.subtype_data.append({'subtype_name': subtype})
+        
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.addWidget(title)
+        layout.addWidget(self.list)
+        
+        
+    def get_content(self):
+        selected_index = self.list.currentIndex()
+        if selected_index > 0:
+            print(f"Searching {self.subtype_data[selected_index]['subtype_name']}")
+            return self.subtype_data[selected_index]['subtype_name']
         else:
             return ''
 

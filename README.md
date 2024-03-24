@@ -43,7 +43,6 @@ The available filters are:
 * Pokemon TCG Set
 * Pokemon Type
 * Pokemon Subtype
-* Rarity
 
 Clicking on the filter will sort the data. Clicking on the drop-down menu will allow users to filter the data
 
