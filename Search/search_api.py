@@ -18,24 +18,42 @@ class Card():
     def __init__(self, data):
         self.supertype = data.get("supertype")
         self.name = data.get("name")
-        self.nationalPokedexNumbers = data.get("nationalPokedexNumbers")
         self.set = data.get("set", {}).get("name")
         self.setNo = data.get("number")
-        self.types = data.get("types", [])
+        self.rarity = data.get("rarity")
         self.image_url = data.get("images",{}).get("small")
         
+        # Get the card's national dex number
+        if data.get("nationalPokedexNumbers"):
+            self.nationalPokedexNo = data.get("nationalPokedexNumbers")[0]
+        else:
+            self.nationalPokedexNo = None
+            
+        # Get the card's types
+        if data.get("types") and len(data.get("types")) > 1:
+            self.type = data.get("types", [])
+        else:
+            self.type = data.get("types")
+            
+        # Get the card's subtypes
         if data.get("subtypes") and len(data.get("subtypes")) > 1:
-            self.subtype = data.get("subtypes", [])[-1]
+            self.subtype = data.get("subtypes", [])
         else:
             self.subtype = data.get("subtypes")
         
+        # Get the card's price
         if self.set_price(data):
             self.price = round(self.set_price(data), 2)
         else:
             self.price = self.set_price(data)
-        
+    
+    # Prints the card as a string
     def __str__(self):
-        return f"Card: {self.name}\nSupertype: {self.supertype}\nSet: {self.set}\nSet Number: {self.setNo}\nTypes: {self.types}\nSubtypes: {self.subtype}\nPrice: {self.price}"
+        return f"Card: {self.name}\nSupertype: {self.supertype}\nSet: {self.set}\nSet Number: {self.setNo}\nTypes: {self.type}\nSubtypes: {self.subtype}\nPrice: {self.price}"
+        
+    # Converts a card to a record that can be inserted into the database
+    def to_tuple(self):
+        return (self.supertype, self.name, self.nationalPokedexNo, self.set, self.setNo, str(self.type), str(self.subtype), self.rarity, self.price)
         
     # Price function to avoid having missing prices
     def set_price(self, data):

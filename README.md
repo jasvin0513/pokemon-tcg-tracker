@@ -14,7 +14,6 @@ The available filters are:
 * Card Name
 * Pokemon National Dex # (if applicable)
 * Pokemon TCG Set
-* Pokemon TCG Set #
 * Pokemon Type
 * Pokemon Subtype
 * Rarity

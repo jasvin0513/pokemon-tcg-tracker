@@ -1,12 +1,36 @@
-import sys
+import sys, sqlite3
 from PySide6 import QtWidgets
 from Home.home import HomePage
 from Sidebar.sidebar import SideBar
 from Search.search_page import SearchPage
 
+def create_db():
+    # Connect to database
+    conn = sqlite3.connect('Database/card_collection.db')
+    cursor = conn.cursor()
+    
+    # Create a new database if one doesn't exist
+    cursor.execute('''CREATE TABLE IF NOT EXISTS card_collection (
+                        "Supertype" CHAR,
+                        "Name" CHAR,
+                        "National #" INT,
+                        "Set" CHAR,
+                        "Set #" INT,
+                        "Type" CHAR,
+                        "Subtype" CHAR,
+                        "Rarity" CHAR,
+                        "Worth" DECIMAL
+                    );''')
+    
+    conn.commit()
+    conn.close()
+
 class MainWindow(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        
+        # Initialize the collection database if it doesn't already exist
+        create_db()
         
         # Create instances of each page
         self.page_width = 1150

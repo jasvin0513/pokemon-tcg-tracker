@@ -1,7 +1,7 @@
 """
 This is the main search file that displays all cards captured by a search
 """
-import sys, requests
+import sys, requests, sqlite3
 from functools import partial
 from PySide6 import QtCore, QtWidgets, QtGui
 from . import search_selection, search_filters
@@ -82,7 +82,7 @@ class CardDetails(QtWidgets.QDialog):
         
         # Button to add cards to the collection
         confirm_button = QtWidgets.QPushButton("Add to Collection")
-        confirm_button.clicked.connect(lambda: self.add_cards(quantity_input.text()))
+        confirm_button.clicked.connect(lambda: self.add_cards(card, quantity_input.text()))
         
         # Display all components vertically
         layout = QtWidgets.QVBoxLayout(self)
@@ -91,14 +91,31 @@ class CardDetails(QtWidgets.QDialog):
         layout.addWidget(quantity_input)
         layout.addWidget(confirm_button)
     
-    def add_cards(self, quantity):
+    def add_cards(self, card, quantity):
         try:
             if int(quantity) > 0:
+                # Connect to the SQLite database file
+                conn = sqlite3.connect('Database/card_collection.db')
+                cursor = conn.cursor()
+                
+                # Add cards to the database
+                card_record = card.to_tuple()
+                
+                for _ in range(int(quantity)):
+                    print(f"Inserting {card_record}")
+                    cursor.execute('''INSERT INTO card_collection ("Supertype", "Name", "National #", "Set", "Set #", "Type", "Subtype", "Rarity", "Worth")
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', card_record)
+                
+                # Commit changes to the database
+                conn.commit()
+                conn.close()
+                
                 print(f"{quantity} added to collection")
                 self.accept()
             else:
                 print("Invalid quantity")
-        except:
+        except Exception as e:
+            print(e)
             print("Invalid quantity")
 
 # Create the search page
