@@ -11,6 +11,7 @@ def create_db():
     
     # Create a new database if one doesn't exist
     cursor.execute('''CREATE TABLE IF NOT EXISTS card_collection (
+                        "ID" INTEGER PRIMARY KEY,
                         "Supertype" CHAR,
                         "Name" CHAR,
                         "National #" INT,
