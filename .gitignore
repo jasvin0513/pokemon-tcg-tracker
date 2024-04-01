@@ -1,4 +1,7 @@
 # Ignore the env directory
 env/
+
 .env
-Database/card_collection.db
+
+# Ignore files in the Database directory
+Database/*
