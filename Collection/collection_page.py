@@ -2,7 +2,7 @@
 This is the main collection file that displays all cards currently in the database
 """
 import sys, sqlite3, functools
-from PySide6 import QtCore, QtWidgets, QtGui, QtSql
+from PySide6 import QtCore, QtWidgets, QtSql
 
 # Create a dialog for displaying additional information
 class RowDialog(QtWidgets.QDialog):
@@ -10,7 +10,6 @@ class RowDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, record=None):
         # Create the dialog
         super().__init__(parent)
-        print("Dialog created")
         self.setWindowTitle("Row Information")
         self.layout = QtWidgets.QVBoxLayout(self)
         self.label = QtWidgets.QLabel()
@@ -44,9 +43,6 @@ class RowDialog(QtWidgets.QDialog):
         
         # Delete the dialog once a button is clicked
         self.rejected.connect(self.deleteLater())
-
-    def __del__(self):
-        print(f"Dialog {self.card_id} deleted")
         
     def set_text(self):
         card_details_message = (
@@ -99,7 +95,6 @@ class RowDialog(QtWidgets.QDialog):
         self.hide()
         self.reject()
 
-
 # Create the collection page
 class CollectionPage(QtWidgets.QWidget):
     def __init__(self, width, height):
@@ -121,6 +116,7 @@ class CollectionPage(QtWidgets.QWidget):
         
         # Connect the clicked signal of the table view to open_dialog slot
         self.table_view.clicked.connect(self.open_dialog)
+        
 
         
     def connect_database(self):
@@ -179,6 +175,7 @@ class CollectionPage(QtWidgets.QWidget):
         
     def refreshTable(self):
         self.load_table()
+        print("Collection reloaded")
         
         
 if __name__ == "__main__":

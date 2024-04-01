@@ -3,6 +3,7 @@ from PySide6 import QtWidgets
 from Home.home import HomePage
 from Sidebar.sidebar import SideBar
 from Search.search_page import SearchPage
+from Collection.collection_page import CollectionPage
 
 def create_db():
     # Connect to database
@@ -47,18 +48,21 @@ class MainWindow(QtWidgets.QWidget):
         # Home Page
         self.home = HomePage(self.page_width, self.page_height)
         
+        # Collection Page
+        self.collection = CollectionPage(self.page_width, self.page_height)
+        
         # Search Page
         self.search = SearchPage(self.page_width, self.page_height)
         
         # Create stacked widget to switch between pages
         self.stackedWidget = QtWidgets.QStackedWidget()
         self.stackedWidget.addWidget(self.home)
+        self.stackedWidget.addWidget(self.collection)
         self.stackedWidget.addWidget(self.search)
         
         # Create an instance of the sidebar
         self.sidebar_width = 100
-        self.sidebar = SideBar(self.sidebar_width, self.page_height, self.stackedWidget)
-        
+        self.sidebar = SideBar(self.sidebar_width, self.page_height, self.stackedWidget, self.collection)
         
         # Arrange the sidebar and stacked widget horizontally
         self.layout = QtWidgets.QHBoxLayout(self)
