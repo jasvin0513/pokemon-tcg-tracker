@@ -1,13 +1,16 @@
 """
 This is the main collection file that displays all cards currently in the database
 """
-import sys, sqlite3
+import sys, sqlite3, functools
 from PySide6 import QtCore, QtWidgets, QtGui, QtSql
 
 # Create a dialog for displaying additional information
 class RowDialog(QtWidgets.QDialog):
+    
     def __init__(self, parent=None, record=None):
+        # Create the dialog
         super().__init__(parent)
+        print("Dialog created")
         self.setWindowTitle("Row Information")
         self.layout = QtWidgets.QVBoxLayout(self)
         self.label = QtWidgets.QLabel()
@@ -29,16 +32,22 @@ class RowDialog(QtWidgets.QDialog):
         # Print the card's details
         self.set_text()
         
-        # Add a 'delete card' button
-        self.deleteButton = QtWidgets.QPushButton("Delete Card")
-        self.layout.addWidget(self.deleteButton)
-        self.deleteButton.clicked.connect(lambda: self.deleteCard())
-        
         # Add a 'add copy' button
         self.addCopyButton = QtWidgets.QPushButton("Add a copy")
         self.layout.addWidget(self.addCopyButton)
-        self.addCopyButton.clicked.connect(lambda: self.addCard())
+        self.addCopyButton.clicked.connect(functools.partial(self.addCard))
+        
+        # Add a 'delete card' button
+        self.deleteButton = QtWidgets.QPushButton("Delete Card")
+        self.layout.addWidget(self.deleteButton)
+        self.deleteButton.clicked.connect(functools.partial(self.deleteCard))
+        
+        # Delete the dialog once a button is clicked
+        self.rejected.connect(self.deleteLater())
 
+    def __del__(self):
+        print(f"Dialog {self.card_id} deleted")
+        
     def set_text(self):
         card_details_message = (
             f"Supertype: {self.supertype}\n"
@@ -56,7 +65,21 @@ class RowDialog(QtWidgets.QDialog):
         self.label.setAlignment(QtCore.Qt.AlignLeft)
 
     def deleteCard(self):
-        pass
+        # Connect to the database
+        conn = sqlite3.connect('Database/card_collection.db')
+        cursor = conn.cursor()
+        
+        cursor.execute(f'''DELETE FROM card_collection WHERE ID = {self.card_id}''')
+        
+        # Commit changes to the database
+        conn.commit()
+        conn.close()
+                
+        # Refresh the table after deleting
+        print("Card deleted from collection")
+        self.parent().refreshTable()
+        self.hide()
+        self.reject()
     
     def addCard(self):
         # Connect to the database
@@ -69,9 +92,13 @@ class RowDialog(QtWidgets.QDialog):
         # Commit changes to the database
         conn.commit()
         conn.close()
-                
+        
+        # Refresh the table after adding a card
         print("Card added to collection")
-        self.accept()
+        self.parent().refreshTable()
+        self.hide()
+        self.reject()
+
 
 # Create the collection page
 class CollectionPage(QtWidgets.QWidget):
@@ -87,6 +114,13 @@ class CollectionPage(QtWidgets.QWidget):
         self.model = QtSql.QSqlTableModel()
         if self.connect_database():
             self.load_table()
+            
+        # Add the table to horizontal layout
+        self.layout = QtWidgets.QHBoxLayout(self)
+        self.layout.addWidget(self.table_view)
+        
+        # Connect the clicked signal of the table view to open_dialog slot
+        self.table_view.clicked.connect(self.open_dialog)
 
         
     def connect_database(self):
@@ -132,13 +166,6 @@ class CollectionPage(QtWidgets.QWidget):
         # Populate table with data
         self.model.setQuery(query)
         self.table_view.setModel(self.model)
-        
-        # Connect the clicked signal of the table view to open_dialog slot
-        self.table_view.clicked.connect(self.open_dialog)
-        
-        # Add the table to horizontal layout
-        self.layout = QtWidgets.QHBoxLayout(self)
-        self.layout.addWidget(self.table_view)
             
     def open_dialog(self, index):
         row = index.row()
@@ -149,6 +176,9 @@ class CollectionPage(QtWidgets.QWidget):
         # Create a dialog for the card
         dialog = RowDialog(self, record)
         dialog.exec()
+        
+    def refreshTable(self):
+        self.load_table()
         
         
 if __name__ == "__main__":
