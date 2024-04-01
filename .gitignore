@@ -4,4 +4,4 @@ env/
 .env
 
 # Ignore files in the Database directory
-Database/*
+Database/card_collection.db

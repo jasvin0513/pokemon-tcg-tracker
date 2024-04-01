@@ -16,21 +16,15 @@ deactivate
 pip install pyside6
 ```
 
-# Home screen
+### Other Packages
 
-## GUI
+* python-dotenv
+* requests
 
-The home screen will display:
+# API Key
 
-* 2 buttons
-* Program title
-* Program logo
+Get the API key through the Pokemon TCG API developer portal and place the following .env file within the root directory:
 
-
-## Functionality
-
-The home screen will have 2 buttons:
-
-* Viewing your collection
-* Searching for cards
-
+```
+APIKEY=KEY
+```
