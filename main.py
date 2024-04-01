@@ -9,7 +9,7 @@ def create_db():
     conn = sqlite3.connect('Database/card_collection.db')
     cursor = conn.cursor()
     
-    # Create a new database if one doesn't exist
+    # Create a new card collection if one doesn't exist
     cursor.execute('''CREATE TABLE IF NOT EXISTS card_collection (
                         "ID" INTEGER PRIMARY KEY,
                         "Supertype" CHAR,
@@ -21,6 +21,13 @@ def create_db():
                         "Subtype" CHAR,
                         "Rarity" CHAR,
                         "Worth" DECIMAL
+                    );''')
+    
+    # Create a new card collection if one doesn't exist
+    cursor.execute('''CREATE TABLE IF NOT EXISTS card_counts (
+                        "ID" INTEGER PRIMARY KEY,
+                        "Set" CHAR,
+                        "Set #" INT
                     );''')
     
     conn.commit()
