@@ -14,8 +14,8 @@ class SideBar(QtWidgets.QFrame):
         self.height = height
         
         # Create buttons
-        buttonWidth = 50
-        buttonHeight = 50
+        buttonWidth = 70
+        buttonHeight = 70
         
         # Button and signal for the collections page
         self.collection = QtWidgets.QPushButton("Collection")
@@ -30,6 +30,7 @@ class SideBar(QtWidgets.QFrame):
         # Button for the analytics page
         self.analytics = QtWidgets.QPushButton("Analytics")
         self.analytics.setFixedSize(buttonWidth, buttonHeight)
+        self.analytics.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(3))
         
         # Style buttons vertically in the sidebar
         self.layout = QtWidgets.QVBoxLayout(self)

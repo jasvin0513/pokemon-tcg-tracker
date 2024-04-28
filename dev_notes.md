@@ -20,6 +20,7 @@ pip install pyside6
 
 * python-dotenv
 * requests
+* Matplotlib
 
 # API Key
 

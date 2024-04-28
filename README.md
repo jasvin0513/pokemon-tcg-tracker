@@ -4,11 +4,11 @@ This program allows users to view all released English Pokemon cards as well as 
 
 ## Personal Collections
 
-The personal collection feature allows users to track their collection, filter their cards and save them as a CSV file.
+The personal collection feature allows users to track their card collection with their tracking information
 
-### Filters
+### Tracking Information
 
-The available filters are:
+The available information being tracked are:
 
 * Card Supertype
 * Card Name
@@ -20,17 +20,9 @@ The available filters are:
 * Count
 * Worth
 
-Clicking on the filter will sort the data. Clicking on the drop-down menu will allow users to filter the data
-
-### Features
-
-Additional features include:
-
-* Exporting collections as a CSV file
-* Importing collections using the Pokemon TCG tracker template as a CSV file
-* Deleting certain cards from your collection individually or completely
-
 ## Searching Cards
+
+Users can search for cards directly from the app in order to add cards to their collection
 
 ### Filters
 
@@ -43,10 +35,15 @@ The available filters are:
 * Pokemon Type
 * Pokemon Subtype
 
-Clicking on the filter will sort the data. Clicking on the drop-down menu will allow users to filter the data
+## Analytics
 
-### Features
+The analytics page provides a high level overview of the user's card collection
 
-Additional features include:
+### Insights
 
-* Switching between a gallery and list view
+The available insights are:
+
+* Total card count in the collection
+* Total worth of the collection
+* Graph of cards by rarity
+* Graph of cards by rarity frequency

@@ -4,6 +4,7 @@ from Home.home import HomePage
 from Sidebar.sidebar import SideBar
 from Search.search_page import SearchPage
 from Collection.collection_page import CollectionPage
+from Analytics.analytics_page import AnalyticsPage
 
 def create_db():
     # Connect to database
@@ -54,11 +55,15 @@ class MainWindow(QtWidgets.QWidget):
         # Search Page
         self.search = SearchPage(self.page_width, self.page_height)
         
+        # Analytics Page
+        self.analytics = AnalyticsPage(self.page_width, self.page_height)
+        
         # Create stacked widget to switch between pages
         self.stackedWidget = QtWidgets.QStackedWidget()
         self.stackedWidget.addWidget(self.home)
         self.stackedWidget.addWidget(self.collection)
         self.stackedWidget.addWidget(self.search)
+        self.stackedWidget.addWidget(self.analytics)
         
         # Create an instance of the sidebar
         self.sidebar_width = 100
